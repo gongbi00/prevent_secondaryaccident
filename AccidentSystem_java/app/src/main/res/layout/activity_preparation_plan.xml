@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".preparation_plan">
+
+    <Button
+        android:id="@+id/buttonpolice"
+        android:layout_width="167dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="21dp"
+        android:text="112"
+        app:layout_constraintEnd_toStartOf="@+id/buttonnineoneone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/buttonnineoneone"
+        android:layout_width="167dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="28dp"
+        android:text="119"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonpolice"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+    <Button
+        android:id="@+id/buttonhy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="40dp"
+        android:text="현대해상"
+        app:layout_constraintEnd_toStartOf="@+id/buttonkb"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonpolice" />
+
+    <Button
+        android:id="@+id/buttonkb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="35dp"
+        android:text="KB다이렉트"
+        app:layout_constraintStart_toEndOf="@+id/buttonhy"
+        app:layout_constraintTop_toBottomOf="@+id/buttonpolice" />
+
+    <Button
+        android:id="@+id/buttoncr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="32dp"
+        android:text="Carrot/캐롯"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonkb"
+        app:layout_constraintTop_toBottomOf="@+id/buttonnineoneone" />
+
+    <Button
+        android:id="@+id/buttondb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="35dp"
+        android:text="DB손해보험"
+        app:layout_constraintEnd_toStartOf="@+id/buttonss"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonhy" />
+
+    <Button
+        android:id="@+id/buttonss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="40dp"
+        android:text="삼성다이렉트"
+        app:layout_constraintStart_toEndOf="@+id/buttondb"
+        app:layout_constraintTop_toBottomOf="@+id/buttonkb" />
+
+    <Button
+        android:id="@+id/buttonaxa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="32dp"
+        android:text="AXA손해보험"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonss"
+        app:layout_constraintTop_toBottomOf="@+id/buttoncr" />
+
+    <Button
+        android:id="@+id/elsecompany"
+        android:layout_width="347dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="28dp"
+        android:text="직접검색"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonss" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="194dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="64dp"
+        android:text="사고 대처 방안"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="124dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="147dp"
+        android:layout_marginTop="300dp"
+        android:layout_marginEnd="142dp"
+        android:text="전화번호"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="382dp"
+        android:layout_height="162dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="18dp"
+        android:text="1. 교통사고 발생 시 즉시 정차하기 \n2. 부상자가 있는지 확인하고 119 신고하기 \n3. 상대방과 명함 교환 후 보험사에 사고 접수하기 \n4. 경찰에 전화하여 교통사고 신고하기 \n5. 사고 현장 촬영하기 \n6. 사고 후 건강 상태 반드시 체크하여 보험사나 경찰에게 \n     알리기"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
