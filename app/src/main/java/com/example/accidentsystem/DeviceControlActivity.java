@@ -101,19 +101,16 @@ public class DeviceControlActivity extends Activity{
                 String a = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.d("a :" , a);
                 if(a.contains("ACC") == true){
-
+                    Intent callintent = new Intent(DeviceControlActivity.this, preparation_plan.class);
+                    startActivity(callintent);
                 }
                 else{
-                    if(a.contains("w") == true){
-                        int s = a.indexOf("w");
-                        int e = a.indexOf("\r\n");
+                    if(a.contains("n") == true){
                         Double lati = Double.parseDouble(a.replace("w" , ""));
                         Log.d("lati : ", Double.toString(lati));
                         receivepacket.latitude = lati;
                     }
-                    if(a.contains("k") == true){
-                        int s = a.indexOf("k");
-                        int e = a.indexOf("\r\n");
+                    if(a.contains("e") == true){
                         Double longi = Double.parseDouble(a.replace("k" , ""));
                         Log.d("longi : ", Double.toString(longi));
                         receivepacket.longitude = longi;
