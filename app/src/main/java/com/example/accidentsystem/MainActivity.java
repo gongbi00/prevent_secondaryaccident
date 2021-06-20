@@ -1,8 +1,10 @@
 package com.example.accidentsystem;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -32,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Set;
 
+
 class Packet{
     double latitude; double longitude;
     int year; int month; int day; int ap;
@@ -39,7 +42,7 @@ class Packet{
 }
 
 public class MainActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener, MapView.POIItemEventListener {
-    MapView mapView;
+    static MapView mapView;
     RelativeLayout mapViewContainer;
     Packet packet = new Packet();
     int i = 1;
@@ -47,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     boolean sign2 = false;
     Packet accident_packet = new Packet();
     Packet accident_packet2 = new Packet();
-    MakeThread thread;
     static final int REQUEST_ENABLE_BT = 10;
     BluetoothAdapter bluetoothAdapter;
     Set<BluetoothDevice> device;
@@ -56,10 +58,31 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     OutputStream outputStream = null;
     InputStream inputStream = null;
     Packet[] read;
-
+    Packet receivepacket = new Packet();
 
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        /*
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(bluetoothAdapter == null){
+            // 디바이스가 블루투스를 지원하지 않을때
+            Log.d("bluetoothAdapter",String.format("Null"));
+        }
+        else{
+            if(bluetoothAdapter.isEnabled()){
+                //블루투스가 활성화상태
+
+                //Intent intent = new Intent(this, DeviceScanActivity.class);
+                //startActivity(intent);
+                Log.d("bluetoothAdapter",String.format("Enable"));
+            }
+            else{
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(intent, REQUEST_ENABLE_BT);
+            }
+        }
+         */
+
         setContentView(R.layout.activity_main);
         mapViewContainer = (RelativeLayout)findViewById(R.id.map_view);
         mapView = new MapView(this);
@@ -70,22 +93,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
         mapView.setMapViewEventListener(this);
         mapView.setPOIItemEventListener(this);
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter == null){
-            // 디바이스가 블루투스를 지원하지 않을때
-            Log.d("bluetoothAdapter",String.format("Null"));
-        }
-        else{
-            if(bluetoothAdapter.isEnabled()){
-                //블루투스가 활성화상태
-                //selectBluetoothDevice();
-                Log.d("bluetoothAdapter",String.format("Enable"));
-            }
-            else{
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intent, REQUEST_ENABLE_BT);
-            }
-        }
+
+
         /*
         accident_packet.latitude = 33.453079;
         accident_packet.longitude = 126.557610;
@@ -97,37 +106,6 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         thread = new MakeThread();
         thread.start();
         */
-    }
-
-    private class MakeThread extends Thread {
-        public void run() {
-            try {
-                Thread.sleep(20000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            while (true) {
-                if (sign1 == true) {
-                    MapPoint accident = MapPoint.mapPointWithGeoCoord(accident_packet.latitude, accident_packet.longitude);
-                    MapPOIItem a = DrawAccidentMarker(accident);
-                    MapPoint accident2 = MapPoint.mapPointWithGeoCoord(accident_packet2.latitude, accident_packet2.longitude);
-                    MapPOIItem b = DrawAccidentMarker(accident2);
-                    while (true) {
-                        Calendar today = Calendar.getInstance();
-                        if (today.get(Calendar.MINUTE) >= accident_packet.min + 1) {
-                            mapView.removePOIItem(a);
-                            sign1 = false;
-                            //break;
-                        }
-                        if (today.get(Calendar.MINUTE) >= accident_packet2.min + 1) {
-                            mapView.removePOIItem(b);
-                            sign2 = false;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -165,7 +143,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     public void onCurrentLocationUpdateFailed(MapView mapView) {}
     public void onCurrentLocationUpdateCancelled(MapView mapView) {}
 
-    public MapPOIItem DrawAccidentMarker(MapPoint accidentMapPoint){
+    public static MapPOIItem DrawAccidentMarker(double latitude, double longitude){
+        MapPoint accidentMapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude);
         MapPOIItem marker = new MapPOIItem();
         marker.setItemName("사고 위치");
         marker.setTag(0);
@@ -219,6 +198,17 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         stoppacket.latitude = stopPointGeo.latitude;
         setNow(stoppacket);
         DrawStopAccidentMarker(mapView, mapPoint);
+        //String sendpacket = String.valueOf(stoppacket.latitude) + " " + String.valueOf(stoppacket.longitude) + " " + String.valueOf(stoppacket.year) + " " + String.valueOf(stoppacket.month) + " " + String.valueOf(stoppacket.day) + " " + String.valueOf(stoppacket.ap) + " " + String.valueOf(stoppacket.hour) + " " + String.valueOf(stoppacket.min) + " " + String.valueOf(stoppacket.sec);
+        //byte[] bytes = sendpacket.getBytes();
+        String a = "abc" + "\n";
+        String latit = String.valueOf(stoppacket.latitude) + "\n" ;
+        String longi = String.valueOf(stoppacket.longitude);
+//double byte론 18, String으론 크기 19
+//int byte론 5 String으론 5
+        //Log.d("보낼데이터 크기",String.format("업데이트 됨(%d)", bytes.length));
+        DeviceControlActivity.transmit(a);
+        DeviceControlActivity.transmit(latit);
+        DeviceControlActivity.transmit(longi);
         double dis = calculateDistance(packet.latitude, packet.longitude, stoppacket.latitude, stoppacket.longitude);
         Log.d("현재위치",String.format("업데이트 됨(%f, %f)", packet.latitude, packet.longitude));
         Log.d("사고위치",String.format("업데이트 됨(%f, %f)", stoppacket.latitude, stoppacket.longitude));
@@ -249,4 +239,6 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) { }
     @Override
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) { }
+
+
 }
