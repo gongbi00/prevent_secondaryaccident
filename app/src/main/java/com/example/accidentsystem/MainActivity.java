@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.Timer;
 
 
 class Packet{
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         Log.d("정지사고 위치 ",String.format("위치(%f, %f)",mapPointGeo.latitude, mapPointGeo.longitude));
         MapPOIItem marker = new MapPOIItem();
         marker.setItemName("정지사고 위치" + i);
-        marker.setTag(i);
+        //marker.setTag(i);
         marker.setMapPoint(stopAccidentMapPoint);
         marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
         mapView.zoomOut(false);
@@ -200,15 +201,19 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         DrawStopAccidentMarker(mapView, mapPoint);
         //String sendpacket = String.valueOf(stoppacket.latitude) + " " + String.valueOf(stoppacket.longitude) + " " + String.valueOf(stoppacket.year) + " " + String.valueOf(stoppacket.month) + " " + String.valueOf(stoppacket.day) + " " + String.valueOf(stoppacket.ap) + " " + String.valueOf(stoppacket.hour) + " " + String.valueOf(stoppacket.min) + " " + String.valueOf(stoppacket.sec);
         //byte[] bytes = sendpacket.getBytes();
-        String a = "abc" + "\n";
-        String latit = String.valueOf(stoppacket.latitude) + "\n" ;
-        String longi = String.valueOf(stoppacket.longitude);
+        String latit = "n" + String.valueOf(stoppacket.latitude) + "\r\n" ;
+        String longi = "e" + String.valueOf(stoppacket.longitude) + "\r\n";
 //double byte론 18, String으론 크기 19
 //int byte론 5 String으론 5
         //Log.d("보낼데이터 크기",String.format("업데이트 됨(%d)", bytes.length));
-        DeviceControlActivity.transmit(a);
         DeviceControlActivity.transmit(latit);
-        DeviceControlActivity.transmit(longi);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DeviceControlActivity.transmit(longi);
+            }
+        },1500);
+        //DeviceControlActivity.transmit(longi);
         double dis = calculateDistance(packet.latitude, packet.longitude, stoppacket.latitude, stoppacket.longitude);
         Log.d("현재위치",String.format("업데이트 됨(%f, %f)", packet.latitude, packet.longitude));
         Log.d("사고위치",String.format("업데이트 됨(%f, %f)", stoppacket.latitude, stoppacket.longitude));

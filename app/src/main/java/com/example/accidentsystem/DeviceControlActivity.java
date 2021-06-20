@@ -106,12 +106,16 @@ public class DeviceControlActivity extends Activity{
                 }
                 else{
                     if(a.contains("n") == true){
-                        Double lati = Double.parseDouble(a.replace("w" , ""));
+                        int s = a.indexOf("n");
+                        int e = a.indexOf("\r");
+                        Double lati = Double.parseDouble(a.substring(s+1,10));
                         Log.d("lati : ", Double.toString(lati));
                         receivepacket.latitude = lati;
                     }
                     if(a.contains("e") == true){
-                        Double longi = Double.parseDouble(a.replace("k" , ""));
+                        int s = a.indexOf("e");
+                        int e = a.indexOf("\r");
+                        Double longi = Double.parseDouble(a.substring(s+1,10));
                         Log.d("longi : ", Double.toString(longi));
                         receivepacket.longitude = longi;
                     }
