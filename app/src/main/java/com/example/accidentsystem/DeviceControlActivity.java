@@ -100,26 +100,31 @@ public class DeviceControlActivity extends Activity{
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
                 String a = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
                 Log.d("a :" , a);
-                if(a.contains("w") == true){
-                    int s = a.indexOf("w");
-                    int e = a.indexOf("\r\n");
-                    Double lati = Double.parseDouble(a.replace("w" , ""));
-                    Log.d("lati : ", Double.toString(lati));
-                    receivepacket.latitude = lati;
-                }
-                if(a.contains("k") == true){
-                    int s = a.indexOf("k");
-                    int e = a.indexOf("\r\n");
-                    Double longi = Double.parseDouble(a.replace("k" , ""));
-                    Log.d("longi : ", Double.toString(longi));
-                    receivepacket.longitude = longi;
-                }
-                Log.d("receivepacket : ", String.format("업데이트 됨(%f, %f)",receivepacket.latitude,receivepacket.longitude));
-                if(receivepacket.latitude != -1.000000 && receivepacket.longitude != -1.000000){
+                if(a.contains("ACC") == true){
 
-                    MainActivity.DrawAccidentMarker(receivepacket.latitude, receivepacket.longitude);
-                    receivepacket.latitude = -1;
-                    receivepacket.longitude = -1;
+                }
+                else{
+                    if(a.contains("w") == true){
+                        int s = a.indexOf("w");
+                        int e = a.indexOf("\r\n");
+                        Double lati = Double.parseDouble(a.replace("w" , ""));
+                        Log.d("lati : ", Double.toString(lati));
+                        receivepacket.latitude = lati;
+                    }
+                    if(a.contains("k") == true){
+                        int s = a.indexOf("k");
+                        int e = a.indexOf("\r\n");
+                        Double longi = Double.parseDouble(a.replace("k" , ""));
+                        Log.d("longi : ", Double.toString(longi));
+                        receivepacket.longitude = longi;
+                    }
+                    Log.d("receivepacket : ", String.format("업데이트 됨(%f, %f)",receivepacket.latitude,receivepacket.longitude));
+                    if(receivepacket.latitude != -1.000000 && receivepacket.longitude != -1.000000){
+                        MainActivity.DrawAccidentMarker(receivepacket.latitude, receivepacket.longitude);
+                        receivepacket.latitude = -1;
+                        receivepacket.longitude = -1;
+                        Log.d("receivepacket 초기화 : ", String.format("업데이트 됨(%f, %f)",receivepacket.latitude,receivepacket.longitude));
+                    }
                 }
             }
             else{
