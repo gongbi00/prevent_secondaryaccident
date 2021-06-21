@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,11 +22,14 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class DeviceControlActivity extends Activity{
+
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
@@ -79,27 +83,21 @@ public class DeviceControlActivity extends Activity{
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            Log.d("제발", "start");
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                Log.d("제발", "ACTION_GATT_CONNECTED");
                 mConnected = true;
                 updateConnectionState(R.string.connected);
                 invalidateOptionsMenu();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                Log.d("제발", "ACTION_GATT_DISCONNECTED");
                 mConnected = false;
                 updateConnectionState(R.string.disconnected);
                 invalidateOptionsMenu();
                 clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Log.d("제발", "ACTION_GATT_SERVICES_DISCOVERED");
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                Log.d("제발", "data_available");
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
                 String a = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                Log.d("a :" , a);
                 if(a.contains("ACC") == true){
                     Intent callintent = new Intent(DeviceControlActivity.this, preparation_plan.class);
                     startActivity(callintent);
@@ -122,16 +120,17 @@ public class DeviceControlActivity extends Activity{
                     Log.d("receivepacket : ", String.format("업데이트 됨(%f, %f)",receivepacket.latitude,receivepacket.longitude));
                     if(receivepacket.latitude != -1.000000 && receivepacket.longitude != -1.000000){
                         MainActivity.DrawAccidentMarker(receivepacket.latitude, receivepacket.longitude);
+                        //TextView distextview = (TextView) ((Activity)context).findViewById(R.id.Dis);
+                        //distextview.setText(Double.toString(MainActivity.calculateDistance(receivepacket.latitude,receivepacket.longitude)) + "m");
+                        //distextview.bringToFront();
+                        //distextview.setBackgroundColor(Color.YELLOW);
+                        //distextview.setTextColor(Color.BLACK);
                         receivepacket.latitude = -1;
                         receivepacket.longitude = -1;
                         Log.d("receivepacket 초기화 : ", String.format("업데이트 됨(%f, %f)",receivepacket.latitude,receivepacket.longitude));
                     }
                 }
             }
-            else{
-                Log.d("제발", "else");
-            }
-            Log.d("제발", "X");
         }
     };
 
@@ -139,48 +138,40 @@ public class DeviceControlActivity extends Activity{
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
+    /*
     private final ExpandableListView.OnChildClickListener servicesListClickListner =
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                             int childPosition, long id) {
-                    Log.d("실행위치", "0");
                     if (mGattCharacteristics != null) {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
-                        Log.d("실행위치", "1");
                         final int charaProp = characteristic.getProperties();
-                        Log.d("실행위치", "2");
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
-                            Log.d("실행위치", "3");
                             if (mNotifyCharacteristic != null) {
                                 mBluetoothLeService.setCharacteristicNotification(
                                         mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
-                                Log.d("실행위치", "4");
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
-                            Log.d("실행위치", "5");
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
                                     characteristic, true);
-                            Log.d("실행위치", "6");
                         }
-                        Log.d("실행위치", "7");
                         Intent Mainintent = new Intent(DeviceControlActivity.this, MainActivity.class);
                         startActivity(Mainintent);
                         return true;
 
                     }
-                    Log.d("실행위치", "8");
                     return false;
                 }
             };
-
+    */
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
         mDataField.setText(R.string.no_data);
@@ -198,7 +189,7 @@ public class DeviceControlActivity extends Activity{
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
         mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
-        mGattServicesList.setOnChildClickListener(servicesListClickListner);
+        //mGattServicesList.setOnChildClickListener(servicesListClickListner);
         mConnectionState = (TextView) findViewById(R.id.connection_state);
         mDataField = (TextView) findViewById(R.id.data_value);
 
@@ -224,7 +215,6 @@ public class DeviceControlActivity extends Activity{
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("onPause : " , "O");
         //unregisterReceiver(mGattUpdateReceiver);
     }
 
@@ -265,36 +255,27 @@ public class DeviceControlActivity extends Activity{
                 mBluetoothLeService.connect(mDeviceAddress);
                 Intent Mainintent = new Intent(this, MainActivity.class);
                 startActivity(Mainintent);
-                Log.d("실행위치", "0");
                 if (mGattCharacteristics != null) {
                     final BluetoothGattCharacteristic characteristic =
                             mGattCharacteristics.get(2).get(0);
-                    Log.d("실행위치", "1");
                     final int charaProp = characteristic.getProperties();
-                    Log.d("실행위치", "2");
                     if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                         // If there is an active notification on a characteristic, clear
                         // it first so it doesn't update the data field on the user interface.
-                        Log.d("실행위치", "3");
                         if (mNotifyCharacteristic != null) {
                             mBluetoothLeService.setCharacteristicNotification(
                                     mNotifyCharacteristic, false);
                             mNotifyCharacteristic = null;
-                            Log.d("실행위치", "4");
                         }
                         mBluetoothLeService.readCharacteristic(characteristic);
                     }
-                    Log.d("실행위치", "5");
                     if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                         mNotifyCharacteristic = characteristic;
                         mBluetoothLeService.setCharacteristicNotification(
                                 characteristic, true);
-                        Log.d("실행위치", "6");
                     }
-                    Log.d("실행위치", "7");
                     return true;
                 }
-                Log.d("실행위치", "8");
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -388,24 +369,5 @@ public class DeviceControlActivity extends Activity{
 
     public static void transmit(String superString){
         mBluetoothLeService.writeCharacteristic(superString,bluetoothGattCharacteristic);
-        /*
-        final Handler mHandler = new Handler();
-       // Log.d("문자열" , superString);
-        //Toast.makeText(this, "Wait for the connection to stablish", Toast.LENGTH_LONG).show();
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                //Log.d("BtSending", "run: Sending..");
-                mBluetoothLeService.writeCharacteristic(superString,bluetoothGattCharacteristic);
-                //mHandler.postDelayed(this,250);
-
-            }
-        },1000);
-        */
     }
-
-
-
 }

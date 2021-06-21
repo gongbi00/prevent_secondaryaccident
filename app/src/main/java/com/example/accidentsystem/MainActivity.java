@@ -9,14 +9,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import net.daum.android.map.MapViewEventListener;
 import net.daum.mf.map.api.MapPOIItem;
@@ -42,71 +45,31 @@ class Packet{
     int hour; int min; int sec;
 }
 
+
 public class MainActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener, MapView.POIItemEventListener {
     static MapView mapView;
     RelativeLayout mapViewContainer;
-    Packet packet = new Packet();
+    public static Packet packet = new Packet();
     int i = 1;
-    boolean sign1 = false;
-    boolean sign2 = false;
-    Packet accident_packet = new Packet();
-    Packet accident_packet2 = new Packet();
-    static final int REQUEST_ENABLE_BT = 10;
-    BluetoothAdapter bluetoothAdapter;
-    Set<BluetoothDevice> device;
-    BluetoothDevice bluetoothDevice;
-    BluetoothSocket bluetoothSocket = null;
-    OutputStream outputStream = null;
-    InputStream inputStream = null;
-    Packet[] read;
-    Packet receivepacket = new Packet();
 
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        /*
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter == null){
-            // 디바이스가 블루투스를 지원하지 않을때
-            Log.d("bluetoothAdapter",String.format("Null"));
-        }
-        else{
-            if(bluetoothAdapter.isEnabled()){
-                //블루투스가 활성화상태
-
-                //Intent intent = new Intent(this, DeviceScanActivity.class);
-                //startActivity(intent);
-                Log.d("bluetoothAdapter",String.format("Enable"));
-            }
-            else{
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(intent, REQUEST_ENABLE_BT);
-            }
-        }
-         */
-
         setContentView(R.layout.activity_main);
         mapViewContainer = (RelativeLayout)findViewById(R.id.map_view);
         mapView = new MapView(this);
         mapView.zoomIn(false);
         mapView.setCurrentLocationEventListener(this);
         mapViewContainer.addView(mapView);
+        //TextView disview = (TextView) findViewById(R.id.Dis);
+        //disview.bringToFront();
+        //disview.setBackgroundColor(Color.YELLOW);
+        //disview.setTextColor(Color.BLACK);
         mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
-        //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
         mapView.setMapViewEventListener(this);
         mapView.setPOIItemEventListener(this);
 
-
-        /*
-        accident_packet.latitude = 33.453079;
-        accident_packet.longitude = 126.557610;
-        setNow(accident_packet);
-        accident_packet2.latitude = 33.451954;
-        accident_packet2.longitude = 126.557709;
-        setNow(accident_packet2);
-
-        thread = new MakeThread();
-        thread.start();
-        */
+        thread st = new thread();
+        st.start();
     }
 
     @Override
@@ -128,16 +91,11 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float v) {
         MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
-        Log.d("위치 업데이트",String.format("업데이트 됨(%f, %f)",mapPointGeo.latitude, mapPointGeo.longitude));
         setNow(packet);
         packet.latitude = mapPointGeo.latitude;
         packet.longitude = mapPointGeo.longitude;
-        Log.d("날짜 업데이트",String.format("업데이트 됨(%d, %d)", packet.month, packet.day));
         MapPoint currentMapPoint = MapPoint.mapPointWithGeoCoord(mapPointGeo.latitude, mapPointGeo.longitude);
-        //지도의 중심점을 변경
         mapView.setMapCenterPoint(currentMapPoint, true);
-        //트래킹 모드 끄기
-        //mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
     }
 
     public void onCurrentLocationDeviceHeadingUpdate(MapView mapView, float v) {}
@@ -157,15 +115,14 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     public MapPOIItem DrawStopAccidentMarker(MapView mapView, MapPoint stopAccidentMapPoint){
         MapPoint.GeoCoordinate mapPointGeo = stopAccidentMapPoint.getMapPointGeoCoord();
-        Log.d("정지사고 위치 ",String.format("위치(%f, %f)",mapPointGeo.latitude, mapPointGeo.longitude));
         MapPOIItem marker = new MapPOIItem();
-        marker.setItemName("정지사고 위치" + i);
+        marker.setItemName("정지사고 위치");
         //marker.setTag(i);
         marker.setMapPoint(stopAccidentMapPoint);
         marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
         mapView.zoomOut(false);
         mapView.addPOIItem(marker);
-        i++;
+        //i++;
         return marker;
     }
     public void DrawLine(MapView mapView, MapPoint current, MapPoint accident){
@@ -175,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         line.addPoint(accident);
         mapView.addPolyline(line);
     }
+
     public Packet setNow(Packet packet){
         Calendar today = Calendar.getInstance();
         packet.year = today.get(Calendar.YEAR);
@@ -186,11 +144,11 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         packet.sec = today.get(Calendar.SECOND);
         return packet;
     }
+
     public void onMapViewInitialized(MapView mapView){}
     public void onMapViewCenterPointMoved(MapView mapView, MapPoint mapPoint){}
     public void onMapViewZoomLevelChanged(MapView mapView, int v){}
-    public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint){
-    }
+    public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint){ }
 
     public void onMapViewDoubleTapped(MapView mapView, MapPoint mapPoint){
         Packet stoppacket = new Packet();
@@ -199,13 +157,9 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         stoppacket.latitude = stopPointGeo.latitude;
         setNow(stoppacket);
         DrawStopAccidentMarker(mapView, mapPoint);
-        //String sendpacket = String.valueOf(stoppacket.latitude) + " " + String.valueOf(stoppacket.longitude) + " " + String.valueOf(stoppacket.year) + " " + String.valueOf(stoppacket.month) + " " + String.valueOf(stoppacket.day) + " " + String.valueOf(stoppacket.ap) + " " + String.valueOf(stoppacket.hour) + " " + String.valueOf(stoppacket.min) + " " + String.valueOf(stoppacket.sec);
-        //byte[] bytes = sendpacket.getBytes();
         String latit = "n" + String.valueOf(stoppacket.latitude) + "\r\n" ;
         String longi = "e" + String.valueOf(stoppacket.longitude) + "\r\n";
-//double byte론 18, String으론 크기 19
-//int byte론 5 String으론 5
-        //Log.d("보낼데이터 크기",String.format("업데이트 됨(%d)", bytes.length));
+
         DeviceControlActivity.transmit(latit);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -213,21 +167,22 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                 DeviceControlActivity.transmit(longi);
             }
         },1500);
-        //DeviceControlActivity.transmit(longi);
-        double dis = calculateDistance(packet.latitude, packet.longitude, stoppacket.latitude, stoppacket.longitude);
+        /*
+        double dis = calculateDistance(stoppacket.latitude, stoppacket.longitude);
         Log.d("현재위치",String.format("업데이트 됨(%f, %f)", packet.latitude, packet.longitude));
         Log.d("사고위치",String.format("업데이트 됨(%f, %f)", stoppacket.latitude, stoppacket.longitude));
         Log.d("거리 업데이트",String.format("업데이트 됨(%f)", dis));
+         */
     }
     public void onMapViewLongPressed(MapView mapView, MapPoint mapPoint){}
     public void onMapViewDragStarted(MapView mapView, MapPoint mapPoint){}
     public void onMapViewDragEnded(MapView mapView, MapPoint mapPoint){}
     public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint){}
 
-    public double calculateDistance(double currentlatitude, double currentlongitude, double accidentlatitude, double accidentlongitude){
-        double x = Math.abs(currentlatitude - accidentlatitude);
+    public static double calculateDistance(double accidentlatitude, double accidentlongitude){
+        double x = Math.abs(packet.latitude - accidentlatitude);
         x = x * 133.33;
-        double y = Math.abs(currentlongitude - accidentlongitude);
+        double y = Math.abs(packet.longitude - accidentlongitude);
         y = y * 133.33;
         double distance = Math.sqrt(x*x+y*y);
         distance = 1000 * distance;
@@ -245,5 +200,26 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     @Override
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) { }
 
-
+    class thread extends Thread{
+        public void run(){
+            while(true){
+                String latit = "n" + String.valueOf(packet.latitude) + "\r\n" ;
+                String longi = "e" + String.valueOf(packet.longitude) + "\r\n";
+                DeviceControlActivity.transmit(latit);
+                Handler mHandler = new Handler(Looper.getMainLooper());
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        DeviceControlActivity.transmit(longi);
+                    }
+                },1000);
+                try{
+                    Thread.sleep(2000);
+                }
+                catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
